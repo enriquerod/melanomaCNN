@@ -1,6 +1,6 @@
 #no funciona bien, da un nivel de acurrecy muy bajo
 #checar como liberar memoria con las variables
-
+#hprueba branch develop
 import numpy as np
 import os
 import glob
@@ -33,6 +33,7 @@ np.random.seed(seed)
 # print('imprimir segunda')
 # plt.imshow(img, cmap = 'Greys', interpolation = 'None')
 # plt.show()
+print('Develop')
 
 def get_im(path):
     # Load as grayscale
