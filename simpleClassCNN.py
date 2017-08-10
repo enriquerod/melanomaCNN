@@ -23,6 +23,9 @@ from keras.utils import np_utils
 from sklearn.cross_validation import train_test_split
 from sklearn import preprocessing
 
+from keras.utils.vis_utils import plot_model
+
+
 # fix random seed for reproducibility
 seed = 9
 np.random.seed(seed)
@@ -231,3 +234,6 @@ model.fit(X1, Y1, nb_epoch=10, batch_size=10, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, Y_test, verbose=0)
 print("CNN Error: %.2f%%" % (100-scores[1]*100))
+
+graph = plot_model(model, to_file='model.png', show_shapes=True)
+
