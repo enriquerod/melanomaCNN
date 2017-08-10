@@ -11,7 +11,7 @@ import time
 import re
 
 
-from keras.datasets import mnist
+
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
@@ -35,9 +35,13 @@ np.random.seed(seed)
 # plt.show()
 print('Develop')
 
+img_w = 56
+img_h = 56
+img_d = 3
 def get_im(path):
     # Load as grayscale
-    img = cv2.imread(path, 0)
+    img = cv2.imread(path)
+    img = cv2.resize(img, (img_w,img_h))
     return img
 
 # def image_to_feature_vector(image, size=(28, 28)):
@@ -49,7 +53,7 @@ def load_train():
     X_train = []
     X_train_label = []
     print('Read train images and labels')
-    files = glob.glob('Melanoma_training/*.jpg')
+    files = glob.glob('C:/git/Melanoma_training/*.jpg')
     for fl in files:
         flbase = os.path.basename(fl)
         flbase = os.path.splitext(flbase)[0]
@@ -83,7 +87,7 @@ def load_test():
     X_test1 = []
     X_test1_label = []
     print('Read test images and labels')
-    files = glob.glob('Melanoma_testing/*.jpg')
+    files = glob.glob('C:/git/Melanoma_testing/*.jpg')
     for fl in files:
         flbase = os.path.basename(fl)
         flbase = os.path.splitext(flbase)[0]
@@ -112,7 +116,7 @@ def load_test():
 def normalize_train_data():
     train_data, Y_train_data, train_data_label = load_train()
     train_data = np.array(train_data,  dtype=np.uint8)
-    train_data = train_data.reshape(train_data.shape[0], 28, 28, 1)
+    train_data = train_data.reshape(train_data.shape[0], img_w, img_h, img_d)
     train_data = train_data.astype('float32')
     train_data = train_data/255
     #Y_train_data = orderY(train_data_label, Y_train_data)
@@ -123,7 +127,7 @@ def normalize_train_data():
 def normalize_test_data():
     test_data, Y_test_data , test_data_label= load_test()
     test_data = np.array(test_data, dtype=np.uint8)
-    test_data = test_data.reshape(test_data.shape[0], 28, 28, 1)
+    test_data = test_data.reshape(test_data.shape[0], img_w, img_h, img_d)
     test_data = test_data.astype('float32')
     #X_test = preprocessing.scale(X_test)
     test_data = test_data/255
@@ -207,7 +211,7 @@ print('No. de clases: ', classes)
 def baseline_model():
     # create model
     model = Sequential()
-    model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(28, 28, 1),
+    model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(img_w, img_h, img_d),
     activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.2))
