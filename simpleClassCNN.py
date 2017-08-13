@@ -230,7 +230,7 @@ model = baseline_model()
 # Fit the model
 print('Training the CNN ...')
 #model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=10, batch_size=10, verbose=2)
-model.fit(X1, Y1, nb_epoch=10, batch_size=10, verbose=2)
+model.fit(X1, Y1, nb_epoch=1, batch_size=10, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, Y_test, verbose=0)
 print("CNN Error: %.2f%%" % (100-scores[1]*100))
