@@ -12,6 +12,7 @@ import re
 
 
 
+from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
@@ -38,12 +39,15 @@ np.random.seed(seed)
 # plt.show()
 print('Develop')
 
-img_w = 56
-img_h = 56
-img_d = 3
+img_w = 28
+img_h = 28
+img_d = 1
 def get_im(path):
     # Load as grayscale
-    img = cv2.imread(path)
+    if img_d == 1:
+        img = cv2.imread(path,0)
+    else:
+        img = cv2.imread(path)
     img = cv2.resize(img, (img_w,img_h))
     return img
 
@@ -210,30 +214,78 @@ X_test, Y_test = normalize_test_data()
 print('No. de clases: ', classes)
 #X, X_val, Y, Y_val = train_test_split(X1, Y1, test_size=.10)
 
+print('Original...')
+Y1 = Y1[0:50,:]
 
-def baseline_model():
-    # create model
-    model = Sequential()
-    model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(img_w, img_h, img_d),
-    activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.2))
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(classes, activation='softmax'))
-    # Compile model
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    return model
+plt.figure(1)
 
-# build the model
-model = baseline_model()
-# Fit the model
-print('Training the CNN ...')
-#model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=10, batch_size=10, verbose=2)
-model.fit(X1, Y1, nb_epoch=1, batch_size=10, verbose=2)
-# Final evaluation of the model
-scores = model.evaluate(X_test, Y_test, verbose=0)
-print("CNN Error: %.2f%%" % (100-scores[1]*100))
+# create a grid of 3x3 images
+for i in range(0, 9):
+    plt.subplot(330 + 1 + i)
+    
+    if img_d == 1:
+        img_aux = X1[i].reshape(img_w, img_h)
+        plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
+        #plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2GRAY))
+        
+    else:
+        img_aux = X1[i].reshape(img_w, img_h, img_d)
+        plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
+# show the plot
 
-graph = plot_model(model, to_file='model.png', show_shapes=True)
 
+print('Augmenting ...')
+datagen = ImageDataGenerator(featurewise_center=True, featurewise_std_normalization=True)
+#datagen = ImageDataGenerator(rotation_range=90)
+#datagen = ImageDataGenerator(horizontal_flip=True, vertical_flip=True)
+
+# shift = 0.2
+# datagen = ImageDataGenerator(width_shift_range=shift, height_shift_range=shift)
+
+#datagen = ImageDataGenerator(zca_whitening=True)
+
+# fit parameters from data
+datagen.fit(X1)
+# configure batch size and retrieve one batch of images
+plt.hold(True)
+plt.figure(2)
+for X_batch, y_batch in datagen.flow(X1, Y1, batch_size=50, save_to_dir='augmented', save_prefix='aug', save_format='png'):
+    for i in range(0, 9):
+        plt.subplot(330 + 1 + i)
+        img_aux = X_batch[i].reshape(img_w, img_h, img_d)
+        # if img_d == 1:
+        #     img_aux = X_batch[i].reshape(img_w, img_h)
+        #     plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
+        # else:
+        #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
+        #     plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
+    
+    #plt.show()
+    break
+
+
+# def baseline_model():
+#     # create model
+#     model = Sequential()
+#     model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(img_w, img_h, img_d),
+#     activation='relu'))
+#     model.add(MaxPooling2D(pool_size=(2, 2)))
+#     model.add(Dropout(0.2))
+#     model.add(Flatten())
+#     model.add(Dense(128, activation='relu'))
+#     model.add(Dense(classes, activation='softmax'))
+#     # Compile model
+#     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+#     return model
+
+# # build the model
+# model = baseline_model()
+# # Fit the model
+# print('Training the CNN ...')
+# #model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=10, batch_size=10, verbose=2)
+# model.fit(X1, Y1, nb_epoch=1, batch_size=10, verbose=2)
+# # Final evaluation of the model
+# scores = model.evaluate(X_test, Y_test, verbose=0)
+# print("CNN Error: %.2f%%" % (100-scores[1]*100))
+
+# graph = plot_model(model, to_file='model.png', show_shapes=True)
