@@ -28,8 +28,8 @@ from keras.utils.vis_utils import plot_model
 
 
 # fix random seed for reproducibility
-seed = 9
-np.random.seed(seed)
+# seed = 9
+# np.random.seed(seed)
 # img = cv2.imread('mnist_training/0.png', 0)
 # files = glob.glob('mnist_training/*.png')
 # print(files[0])
@@ -249,10 +249,13 @@ datagen.fit(X1)
 # configure batch size and retrieve one batch of images
 plt.hold(True)
 plt.figure(2)
-for X_batch, y_batch in datagen.flow(X1, Y1, batch_size=50, save_to_dir='augmented', save_prefix='aug', save_format='png'):
-    for i in range(0, 9):
-        plt.subplot(330 + 1 + i)
-        img_aux = X_batch[i].reshape(img_w, img_h, img_d)
+
+os.makedirs('augmented')
+#, save_prefix='aug'
+for X_batch, y_batch in datagen.flow(X1, Y1, batch_size=50, save_to_dir='augmented', save_format='png'):
+    # for i in range(0, 9):
+    #     plt.subplot(330 + 1 + i)
+    #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
         # if img_d == 1:
         #     img_aux = X_batch[i].reshape(img_w, img_h)
         #     plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
