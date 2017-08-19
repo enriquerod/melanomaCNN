@@ -59,23 +59,17 @@ def load_train():
         # print('imagen test no. :', fl)
         # plt.imshow(img_data, cmap = 'Greys', interpolation = 'None')
         # plt.show()
-        X_train_label.append(flbase)
+
+        X_train_label.append(flbase[0])
+        
         X_train.append(img_data)
     #Y_train = np.loadtxt("Training_GroundTruth.csv", delimiter=",", dtype=None)
     Y_train_csv = np.genfromtxt("Training_GroundTruth.csv", delimiter=",", dtype=None)
-
-    # print(Y_train)
-    # Y_aqui1 = Y_train[0]
-    # print(Y_aqui1)
-    # Y_aqui1 = Y_aqui1[1]
-    # print(Y_aqui1)
 
     Y_train = []
     for j in Y_train_csv:
         Y_train.append(j[1])
 
-
-    #X_train_label = list(map(int, X_train_label))
     return X_train, Y_train, X_train_label
 
 
@@ -87,8 +81,7 @@ def load_image(addr):
     # print(str(addr))
     # print(addr[0])
     # print(map(str,addr[0]))
-    addr_final = 'C:/git/Melanoma_training/ISIC_' + addr[0] + '.jpg' 
-    print(addr_final)
+    addr_final = 'C:/git/Melanoma_training/ISIC_' + addr + '.jpg' 
     img = cv2.imread(addr_final, 0)
     # img = cv2.resize(img, (img_w,img_h), interpolation=cv2.INTER_CUBIC)
     img = cv2.resize(img, (img_w,img_h))
@@ -135,26 +128,33 @@ valid_X = X1[int(0.8*len(X1)):]
 valid_Y = Y1[int(0.8*len(Y1)):]
 valid_L = L1[int(0.8*len(L1)):]
 
-
-print(train_X[0])
-print(train_Y[0])
-
 train_filename = 'train.tfrecords'  # address to save the TFRecords file
 # open the TFRecords file
 writer = tf.python_io.TFRecordWriter(train_filename)
 
+print('Writing variables to TFRecords file...')
+#print(train_L.shape)
 for i in range(len(train_X)):
     # print how many images are saved every 1000 images
     if not i % 1:
         # print('Train data: {}/{}'.format(i, len(train_L), flush=True)
-        print('Train data')
+        print('Train data ', '(', i, '): ', train_L[i])
         #sys.stdout.flush()
     # Load the image
+    # img = load_image(train_L[i])
+
+    # if (i == 0):
+    #     img = img.astype(np.uint8)
+    #     plt.imshow(img, cmap=plt.get_cmap('gray'))
+    #     plt.show()
     img = load_image(train_L[i])
     label = train_Y[i]
+    name = train_L[i]
+
     # Create a feature
     feature = {'train/label': _int64_feature(label),
-               'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+               'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring())),
+               'train/name': _bytes_feature(tf.compat.as_bytes(name))}
     # Create an example protocol buffer
     example = tf.train.Example(features=tf.train.Features(feature=feature))
     
@@ -163,13 +163,3 @@ for i in range(len(train_X)):
     
 writer.close()
 #sys.stdout.flush()
-
-
-
-#READ TFRecords file
-
-
-
-# print(X1[20])
-# print(Y1[20])
-# print(L1[20])
