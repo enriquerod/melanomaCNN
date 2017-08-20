@@ -136,7 +136,7 @@ print('Writing variables to TFRecords file...')
 #print(train_L.shape)
 for i in range(len(train_X)):
     # print how many images are saved every 1000 images
-    if not i % 1:
+    if not i % 50:
         # print('Train data: {}/{}'.format(i, len(train_L), flush=True)
         print('Train data ', '(', i, '): ', train_L[i])
         #sys.stdout.flush()
