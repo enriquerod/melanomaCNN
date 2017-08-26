@@ -13,12 +13,26 @@ import re
 
 
 from keras.preprocessing.image import ImageDataGenerator
+
+from keras.layers import Dense, Lambda
+from keras.layers import Activation, Convolution2D, Dropout, Conv2D
+from keras.layers import AveragePooling2D, BatchNormalization
+from keras.layers import GlobalAveragePooling2D
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Dropout
 from keras.layers import Flatten
-from keras.layers.convolutional import Convolution2D
-from keras.layers.convolutional import MaxPooling2D
+from keras.models import Model
+from keras.layers import Input
+from keras.layers import MaxPooling2D
+from keras.layers import SeparableConv2D
+from keras import layers
+from keras.regularizers import l2
+
+# from keras.models import Sequential
+# from keras.layers import Dense
+# from keras.layers import Dropout
+# from keras.layers import Flatten
+# from keras.layers.convolutional import Convolution2D
+# from keras.layers.convolutional import MaxPooling2D
 from keras.utils import np_utils
 
 from sklearn.cross_validation import train_test_split
@@ -37,10 +51,110 @@ from keras.utils.vis_utils import plot_model
 # print('imprimir segunda')
 # plt.imshow(img, cmap = 'Greys', interpolation = 'None')
 # plt.show()
+
+
+def tiny_XCEPTION(input_shape, num_classes, l2_regularization=0.01):
+    regularization = l2(l2_regularization)
+    print(input_shape)
+    # base
+    img_input = Input(input_shape)
+    print(img_input)
+    x = Conv2D(5, (3, 3), strides=(1, 1), kernel_regularizer=regularization,
+                                            use_bias=False)(img_input)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = Conv2D(5, (3, 3), strides=(1, 1), kernel_regularizer=regularization,
+                                            use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+
+    # module 1
+    residual = Conv2D(8, (1, 1), strides=(2, 2),
+                      padding='same', use_bias=False)(x)
+    residual = BatchNormalization()(residual)
+
+    x = SeparableConv2D(8, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = SeparableConv2D(8, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+
+    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
+    x = layers.add([x, residual])
+
+    # module 2
+    residual = Conv2D(16, (1, 1), strides=(2, 2),
+                      padding='same', use_bias=False)(x)
+    residual = BatchNormalization()(residual)
+
+    x = SeparableConv2D(16, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = SeparableConv2D(16, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+
+    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
+    x = layers.add([x, residual])
+
+    # module 3
+    residual = Conv2D(32, (1, 1), strides=(2, 2),
+                      padding='same', use_bias=False)(x)
+    residual = BatchNormalization()(residual)
+
+    x = SeparableConv2D(32, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = SeparableConv2D(32, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+
+    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
+    x = layers.add([x, residual])
+
+    # module 4
+    residual = Conv2D(64, (1, 1), strides=(2, 2),
+                      padding='same', use_bias=False)(x)
+    residual = BatchNormalization()(residual)
+
+    x = SeparableConv2D(64, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = SeparableConv2D(64, (3, 3), padding='same',
+                        kernel_regularizer=regularization,
+                        use_bias=False)(x)
+    x = BatchNormalization()(x)
+
+    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
+    x = layers.add([x, residual])
+
+    x = Conv2D(num_classes, (3, 3),
+            #kernel_regularizer=regularization,
+            padding='same')(x)
+    x = GlobalAveragePooling2D()(x)
+    output = Activation('softmax',name='predictions')(x)
+
+    model = Model(img_input, output)
+    return model
+
+
+
 print('Develop')
 
-img_w = 28
-img_h = 28
+img_w = 64
+img_h = 64
 img_d = 1
 def get_im(path):
     # Load as grayscale
@@ -60,7 +174,7 @@ def load_train():
     X_train = []
     X_train_label = []
     print('Read train images and labels')
-    files = glob.glob('C:/git/Melanoma_training/*.jpg')
+    files = glob.glob('C:/git/Melanoma_training1/*.jpg')
     for fl in files:
         flbase = os.path.basename(fl)
         flbase = os.path.splitext(flbase)[0]
@@ -94,7 +208,7 @@ def load_test():
     X_test1 = []
     X_test1_label = []
     print('Read test images and labels')
-    files = glob.glob('C:/git/Melanoma_testing/*.jpg')
+    files = glob.glob('C:/git/Melanoma_testing1/*.jpg')
     for fl in files:
         flbase = os.path.basename(fl)
         flbase = os.path.splitext(flbase)[0]
@@ -207,186 +321,109 @@ def orderY(label_try , y_try):
 # num_classes = Y_test.shape[1]
 
 #
-#X_final, X_test_final, Y_final, Y_test_final = train_test_split(X, Y, test_size=0.2, random_state=2)
+# X_final, X_test_final, Y_final, Y_test_final = train_test_split(X, Y, test_size=0.2, random_state=2)
 X1, Y1, classes = normalize_train_data()
 X_test, Y_test = normalize_test_data()
 
 print('No. de clases: ', classes)
-#X, X_val, Y, Y_val = train_test_split(X1, Y1, test_size=.10)
+print(X1.shape)
+print(Y1.shape)
 
-print('Original...')
-Y1 = Y1[0:50,:]
+X, X_val, Y, Y_val = train_test_split(X1, Y1, test_size=.30)
 
-plt.figure(1)
 
-# create a grid of 3x3 images
-for i in range(0, 9):
-    plt.subplot(330 + 1 + i)
+
+
+
+
+
+# print('Original...')
+# Y1 = Y1[0:50,:]
+
+# plt.figure(1)
+
+# # create a grid of 3x3 images
+# for i in range(0, 9):
+#     plt.subplot(330 + 1 + i)
     
-    if img_d == 1:
-        img_aux = X1[i].reshape(img_w, img_h)
-        plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
-        #plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2GRAY))
+#     if img_d == 1:
+#         img_aux = X1[i].reshape(img_w, img_h)
+#         plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
+#         #plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2GRAY))
         
-    else:
-        img_aux = X1[i].reshape(img_w, img_h, img_d)
-        plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
-# show the plot
+#     else:
+#         img_aux = X1[i].reshape(img_w, img_h, img_d)
+#         plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
+# # show the plot
 
+# print('Augmenting ...')
+# datagen = ImageDataGenerator(featurewise_center=True, featurewise_std_normalization=True)
+# #datagen = ImageDataGenerator(rotation_range=90)
+# #datagen = ImageDataGenerator(horizontal_flip=True, vertical_flip=True)
 
-print('Augmenting ...')
-datagen = ImageDataGenerator(featurewise_center=True, featurewise_std_normalization=True)
-#datagen = ImageDataGenerator(rotation_range=90)
-#datagen = ImageDataGenerator(horizontal_flip=True, vertical_flip=True)
+# # shift = 0.2
+# # datagen = ImageDataGenerator(width_shift_range=shift, height_shift_range=shift)
 
-# shift = 0.2
-# datagen = ImageDataGenerator(width_shift_range=shift, height_shift_range=shift)
+# #datagen = ImageDataGenerator(zca_whitening=True)
 
-#datagen = ImageDataGenerator(zca_whitening=True)
+# # fit parameters from data
+# datagen.fit(X1)
+# # configure batch size and retrieve one batch of images
+# plt.hold(True)
+# plt.figure(2)
 
-# fit parameters from data
-datagen.fit(X1)
-# configure batch size and retrieve one batch of images
-plt.hold(True)
-plt.figure(2)
-
-os.makedirs('augmented')
-#, save_prefix='aug'
-for X_batch, y_batch in datagen.flow(X1, Y1, batch_size=50, save_to_dir='augmented', save_format='png'):
-    # for i in range(0, 9):
-    #     plt.subplot(330 + 1 + i)
-    #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
-        # if img_d == 1:
-        #     img_aux = X_batch[i].reshape(img_w, img_h)
-        #     plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
-        # else:
-        #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
-        #     plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
+# os.makedirs('augmented')
+# #, save_prefix='aug'
+# for X_batch, y_batch in datagen.flow(X1, Y1, batch_size=50, save_to_dir='augmented', save_format='png'):
+#     # for i in range(0, 9):
+#     #     plt.subplot(330 + 1 + i)
+#     #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
+#         # if img_d == 1:
+#         #     img_aux = X_batch[i].reshape(img_w, img_h)
+#         #     plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
+#         # else:
+#         #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
+#         #     plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
     
-    #plt.show()
-    break
-
-
-# def baseline_model():
-#     # create model
-#     model = Sequential()
-#     model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(img_w, img_h, img_d),
-#     activation='relu'))
-#     model.add(MaxPooling2D(pool_size=(2, 2)))
-#     model.add(Dropout(0.2))
-#     model.add(Flatten())
-#     model.add(Dense(128, activation='relu'))
-#     model.add(Dense(classes, activation='softmax'))
-#     # Compile model
-#     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-#     return model
-
-# # build the model
-# model = baseline_model()
-# # Fit the model
-# print('Training the CNN ...')
-# #model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=10, batch_size=10, verbose=2)
-# model.fit(X1, Y1, nb_epoch=1, batch_size=10, verbose=2)
-# # Final evaluation of the model
-# scores = model.evaluate(X_test, Y_test, verbose=0)
-# print("CNN Error: %.2f%%" % (100-scores[1]*100))
-
-# graph = plot_model(model, to_file='model.png', show_shapes=True)
+#     #plt.show()
+#     break
 
 
 
 
-def tiny_XCEPTION(input_shape, num_classes, l2_regularization=0.01):
-    regularization = l2(l2_regularization)
 
-    # base
-    img_input = Input(input_shape)
-    x = Conv2D(5, (3, 3), strides=(1, 1), kernel_regularizer=regularization,
-                                            use_bias=False)(img_input)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = Conv2D(5, (3, 3), strides=(1, 1), kernel_regularizer=regularization,
-                                            use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
 
-    # module 1
-    residual = Conv2D(8, (1, 1), strides=(2, 2),
-                      padding='same', use_bias=False)(x)
-    residual = BatchNormalization()(residual)
-
-    x = SeparableConv2D(8, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = SeparableConv2D(8, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-
-    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-    x = layers.add([x, residual])
-
-    # module 2
-    residual = Conv2D(16, (1, 1), strides=(2, 2),
-                      padding='same', use_bias=False)(x)
-    residual = BatchNormalization()(residual)
-
-    x = SeparableConv2D(16, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = SeparableConv2D(16, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-
-    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-    x = layers.add([x, residual])
-
-    # module 3
-    residual = Conv2D(32, (1, 1), strides=(2, 2),
-                      padding='same', use_bias=False)(x)
-    residual = BatchNormalization()(residual)
-
-    x = SeparableConv2D(32, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = SeparableConv2D(32, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-
-    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-    x = layers.add([x, residual])
-
-    # module 4
-    residual = Conv2D(64, (1, 1), strides=(2, 2),
-                      padding='same', use_bias=False)(x)
-    residual = BatchNormalization()(residual)
-
-    x = SeparableConv2D(64, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = SeparableConv2D(64, (3, 3), padding='same',
-                        kernel_regularizer=regularization,
-                        use_bias=False)(x)
-    x = BatchNormalization()(x)
-
-    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-    x = layers.add([x, residual])
-
-    x = Conv2D(num_classes, (3, 3),
-            #kernel_regularizer=regularization,
-            padding='same')(x)
-    x = GlobalAveragePooling2D()(x)
-    output = Activation('softmax',name='predictions')(x)
-
-    model = Model(img_input, output)
+def baseline_model():
+    # create model
+    model = Sequential()
+    model.add(Convolution2D(32, 5, 5, border_mode='valid', input_shape=(img_w, img_h, img_d),
+    activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.2))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(classes, activation='softmax'))
+    # Compile model
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
+
+# build the model
+# model = baseline_model()
+
+model = tiny_XCEPTION((img_h, img_w, img_d), 2, l2_regularization=0.01)
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Fit the model
+print('Training the CNN ...')
+graph = plot_model(model, to_file='model.png', show_shapes=True)
+model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=15, batch_size=300, verbose=2)
+#model.fit(X1, Y1, nb_epoch=10, batch_size=30, verbose=2)
+# Final evaluation of the model
+scores = model.evaluate(X_test, Y_test, verbose=0)
+print("CNN Error: %.2f%%" % (100-scores[1]*100))
+
+
+
+
+
+
