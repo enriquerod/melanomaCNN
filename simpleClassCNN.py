@@ -155,11 +155,11 @@ print('Develop')
 
 img_w = 64
 img_h = 64
-img_d = 1
+img_d = 3
 def get_im(path):
     # Load as grayscale
     if img_d == 1:
-        img = cv2.imread(path,0)
+        img = cv2.imread(path,1)
     else:
         img = cv2.imread(path)
     img = cv2.resize(img, (img_w,img_h))
