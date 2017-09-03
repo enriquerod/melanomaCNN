@@ -27,6 +27,9 @@ from keras.layers import SeparableConv2D
 from keras import layers
 from keras.regularizers import l2
 
+from keras.optimizers import sgd
+import model as sn
+
 # from keras.models import Sequential
 # from keras.layers import Dense
 # from keras.layers import Dropout
@@ -153,8 +156,8 @@ def tiny_XCEPTION(input_shape, num_classes, l2_regularization=0.01):
 
 print('Develop')
 
-img_w = 64
-img_h = 64
+img_w = 224
+img_h = 224
 img_d = 3
 def get_im(path):
     # Load as grayscale
@@ -410,13 +413,21 @@ def baseline_model():
 # build the model
 # model = baseline_model()
 
-model = tiny_XCEPTION((img_h, img_w, img_d), 2, l2_regularization=0.01)
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+#Xception
+# model = tiny_XCEPTION((img_h, img_w, img_d), 2, l2_regularization=0.01)
+# model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+#Squeezznet
+
+model = sn.SqueezeNet( 2, inputs=(3, 224, 224))
+model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
+
+
 
 # Fit the model
 print('Training the CNN ...')
 graph = plot_model(model, to_file='model.png', show_shapes=True)
-model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=15, batch_size=300, verbose=2)
+model.fit(X, Y, validation_data=(X_val, Y_val), nb_epoch=15, batch_size=100, verbose=2)
 #model.fit(X1, Y1, nb_epoch=10, batch_size=30, verbose=2)
 # Final evaluation of the model
 scores = model.evaluate(X_test, Y_test, verbose=0)
