@@ -27,7 +27,7 @@ from keras.layers import SeparableConv2D
 from keras import layers
 from keras.regularizers import l2
 
-from keras.optimizers import sgd
+from keras.optimizers import SGD
 import model as sn
 
 # from keras.models import Sequential
@@ -240,7 +240,8 @@ def load_test():
 def normalize_train_data():
     train_data, Y_train_data, train_data_label = load_train()
     train_data = np.array(train_data,  dtype=np.uint8)
-    train_data = train_data.reshape(train_data.shape[0], img_w, img_h, img_d)
+    # train_data = train_data.reshape(train_data.shape[0], img_w, img_h, img_d)
+    train_data = train_data.reshape(train_data.shape[0], img_d, img_w, img_h)
     train_data = train_data.astype('float32')
     train_data = train_data/255
     #Y_train_data = orderY(train_data_label, Y_train_data)
@@ -418,6 +419,7 @@ def baseline_model():
 # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 #Squeezznet
+sgd = SGD(lr=0.001, decay=0.0002, momentum=0.9, nesterov=True)
 
 model = sn.SqueezeNet( 2, inputs=(3, 224, 224))
 model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
