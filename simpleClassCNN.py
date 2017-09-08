@@ -269,62 +269,6 @@ def orderY(label_try , y_try):
     #y_final = [x for y, x in sorted(zip(y_try, label_try))]
     return y_final
 
-
-# print(X_test.shape)
-# print(Y_test.shape)
-
-# testing_data_bien = np.loadtxt("mnist_train.csv", delimiter=",")
-# X_test_bien = testing_data_bien[:,1:]
-# X_test_bien = X_test_bien.reshape(X_test_bien.shape[0], 28, 28, 1).astype('float32')
-# X_test_bien = X_test_bien/255
-# Y_test_bien = testing_data_bien[0:,0]
-# Y_test_bien = np_utils.to_categorical(Y_test_bien)
-# print('Del dataset bien')
-# print(X_test_bien.shape)
-# print(Y_test_bien.shape)
-
-# imagen = cv2.imread("mnist_testing/0.png", 0)
-# print(imagen)
-#print(num_classes)
-#print(X_test[0])
-#print('Test shape:', X_test.shape)
-#print(X_test.shape[0], 'test samples')
-#
-# #
-
-
-
-# print('Del dataset mal')
-# print(X.shape)
-# print(Y.shape)
-# # # plt.imshow(X_test[0], cmap = 'Greys', interpolation = 'None')
-# # # plt.show()
-# #
-# #
-# # # print(X_train)
-# print('Loading DataSet')
-# # load pima indians dataset
-# training_data = np.loadtxt("mnist_train.csv", delimiter=",")
-# testing_data = np.loadtxt("mnist_test.csv", delimiter=",")
-# # split into input (X) and output (Y) variables
-# X = training_data[:,1:]
-# X_images = X.reshape(X.shape[0], 28, 28).astype('int32')
-# X = X.reshape(X.shape[0], 28, 28, 1).astype('float32')
-# #plt.imshow(X_images[0], cmap = 'Greys')
-# X = X/255
-# Y = training_data[0:,0]
-# Y = np_utils.to_categorical(Y)
-#
-#
-# X_test = testing_data[:,1:]
-# X_tes_images = X_test.reshape(X_test.shape[0], 28, 28).astype('int32')
-# X_test = X_test.reshape(X_test.shape[0], 28, 28, 1).astype('float32')
-# X_test = X_test/255
-# Y_test = testing_data[0:,0]
-# Y_test = np_utils.to_categorical(Y_test)
-# num_classes = Y_test.shape[1]
-
-#
 # X_final, X_test_final, Y_final, Y_test_final = train_test_split(X, Y, test_size=0.2, random_state=2)
 X1, Y1, classes = normalize_train_data()
 X_test, Y_test = normalize_test_data()
