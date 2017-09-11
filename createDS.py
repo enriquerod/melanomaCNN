@@ -18,7 +18,7 @@ import argparse
 img_w = 224
 img_h = 224
 img_d = 3
-output_path = 'C:/git/melanomaCNN'
+output_path = 'C:/git/melanomaCNN/dataset.mat'
 
 def get_im(path):
     # Load as grayscale
@@ -93,8 +93,8 @@ def load_test():
 def normalize_train_data():
     train_data, Y_train_data, train_data_label = load_train()
     train_data = np.array(train_data,  dtype=np.uint8)
-    # train_data = train_data.reshape(train_data.shape[0], img_w, img_h, img_d)
-    train_data = train_data.reshape(train_data.shape[0], img_d, img_w, img_h)
+    train_data = train_data.reshape(train_data.shape[0], img_w, img_h, img_d)
+    # train_data = train_data.reshape(train_data.shape[0], img_d, img_w, img_h)
     train_data = train_data.astype('float32')
     train_data = train_data/255
     #Y_train_data = orderY(train_data_label, Y_train_data)
@@ -123,5 +123,6 @@ X_test, Y_test = normalize_test_data()
 
 X, X_val, Y, Y_val = train_test_split(X1, Y1, test_size=.30)
 
-output = {"X": np.array(X), "Y": Y, "X_val": np.array(X_val) ,"Y_val": Y}
+output = {"X": np.array(X), "Y": Y, "X_val": np.array(X_val) ,"Y_val": Y_val}
 scipy.io.savemat(output_path, output)
+print('Dataset .mat created')
