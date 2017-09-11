@@ -17,15 +17,8 @@ import matplotlib.pyplot as plt
 from models import tiny_XCEPTION
 from utils import load_data
 
-# def normalize_train_data(image, mClass):
-#     data_x = image.reshape(image.shape[0], img_w, img_h, img_d)
-#     data_x = data_x.astype('float32')
-#     data_x = data_x/255
-#     data_y = np_utils.to_categorical(gender, 2)
-#     return data_x, data_y
 
 
-# dataset_path = "C:/Users/EHO085/Desktop/Face Group Age/data/wiki_db.mat"
 dataset_path = "C:/git/dataset.mat"
 img_w = 224
 img_h = 224
@@ -60,6 +53,33 @@ model.save_weights("model.h5")
 print('Training Finished and Weights saved!!!')
 np.save('history.npy', history) 
 print('History saved!!!')
+
+
+print(history.history.keys())  
+plt.figure(1)  
+
+print("Plotting Loss and Accuracy...")
+# summarize history for accuracy  
+
+plt.subplot(211)  
+plt.plot(history.history['acc'])  
+plt.plot(history.history['val_acc'])  
+plt.title('model accuracy')  
+plt.ylabel('accuracy')  
+plt.xlabel('epoch')  
+plt.legend(['train', 'test'], loc='upper left')  
+
+# summarize history for loss  
+
+plt.subplot(212)  
+plt.plot(history.history['loss'])  
+plt.plot(history.history['val_loss'])  
+plt.title('model loss')  
+plt.ylabel('loss')  
+plt.xlabel('epoch')  
+plt.legend(['train', 'test'], loc='upper left')  
+plt.show() 
+
 
 
 
