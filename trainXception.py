@@ -8,6 +8,9 @@ from keras.optimizers import SGD
 from keras.utils import np_utils
 
 from keras.callbacks import ModelCheckpoint
+from keras.callbacks import CSVLogger
+from keras.callbacks import ReduceLROnPlateau
+
 
 from sklearn.cross_validation import train_test_split
 from sklearn import preprocessing
@@ -24,6 +27,7 @@ img_w = 224
 img_h = 224
 img_d = 3
 n_Class = 2
+patience = 30
 
 print("Loading dataset...")
 # image, gender, ageClass, _, _, image_size, _ = load_data(dataset_path)
@@ -39,9 +43,10 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 
 # checkpoint
 filepath="weights-{epoch:02d}-{val_acc:.3f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-callbacks_list = [checkpoint]
-
+checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=True, mode='max')
+reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience), verbose=1)
+csv_logger = CSVLogger('history.csv')
+callbacks_list = [checkpoint, csv_logger, reduce_lr]
 
 # Fit the model
 print('Now, Training the CNN ...')
