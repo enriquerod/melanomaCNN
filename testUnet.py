@@ -20,12 +20,12 @@ img = imgs_test[0]
 img = img.reshape(1, 512, 512, 1)
 print(img.shape)
 
-model = load_model('unet.hdf5', compile=False)
-# myunet = myUnet()
+# model = load_model('unet.hdf5', compile=False)
+myunet = myUnet()
 
-# model = myunet.get_unet()
+model = myunet.get_unet()
 
-# model.load_weights('unet.hdf5')
+model.load_weights('unet.hdf5')
 
 # imgs_mask_test = model.predict(img, verbose=1)
 
