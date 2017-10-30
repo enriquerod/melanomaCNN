@@ -32,7 +32,7 @@ def normalize_train_data(image, y_Class, n_Class, img_w, img_h, img_d):
     image = image.reshape(image.shape[0], img_w, img_h, img_d)
     data_x = image.astype('float32')
     data_x = data_x/255
-    data_y = np_utils.to_categorical(y_class, n_Class)
+    data_y = np_utils.to_categorical(y_Class, n_Class)
 
     return data_x, data_y
 
@@ -42,8 +42,8 @@ def normalize_train_data(image, y_Class, n_Class, img_w, img_h, img_d):
 # img_d = 3
 # n_Class = 2
 # patience = 30
-
-dataset_path = "train/train_db_gray.mat"
+dataset_path = "C:/git priv/train/train_db_gray.mat"
+# dataset_path = "train/train_db_gray.mat"
 img_w = 256
 img_h = 256
 img_d = 1

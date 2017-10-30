@@ -113,3 +113,34 @@ def main():
         # print(preds)
 
         print('Clase: ',np.argmax(preds,axis=1)+1)
+
+
+
+img = img.reshape(1, 128, 128, 1)
+print(img.shape)
+
+# model = load_model('unet.hdf5', compile=False)
+myunet = myUnet()
+
+model = myunet.get_unet()
+
+# model.load_weights('weights-00.hdf5')
+model.load_weights('weights-31.hdf5')
+
+imgs_mask_test = model.predict(img, verbose=1)
+print(imgs_mask_test[0])
+imgs_mask_test[imgs_mask_test > 0.5] = 255
+imgs_mask_test[imgs_mask_test <= 0.5] = 0
+
+# np.save('imgs_mask_test.npy', imgs_mask_test)
+
+print(imgs_mask_test.shape)
+
+img_pred = imgs_mask_test[0]
+img_pred = img_pred.reshape(128, 128)
+# img_pred = img_pred*255
+img_pred = img_pred.astype(np.uint8)
+print(img_pred)
+print("AQUI2",img_pred.shape)
+plt.imshow(img_pred, cmap='gray')
+plt.show()
