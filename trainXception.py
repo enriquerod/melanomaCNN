@@ -18,72 +18,98 @@ from keras.utils.vis_utils import plot_model
 import matplotlib.pyplot as plt
 
 from models import tiny_XCEPTION
-from utils import load_data
+from scipy.io import loadmat
+# from utils import load_data
 
 
+def load_data(mat_path):
+    d = loadmat(mat_path)
+    return d["train"], d["y"]
 
-dataset_path = "C:/git/dataset.mat"
-img_w = 224
-img_h = 224
-img_d = 3
+
+def normalize_train_data(image, y_Class, n_Class, img_w, img_h, img_d):
+    # data_x = image.reshape(image.shape[0], img_w, img_h, img_d)
+    image = image.reshape(image.shape[0], img_w, img_h, img_d)
+    data_x = image.astype('float32')
+    data_x = data_x/255
+    data_y = np_utils.to_categorical(y_class, n_Class)
+
+    return data_x, data_y
+
+# dataset_path = "C:/git/dataset.mat"
+# img_w = 224
+# img_h = 224
+# img_d = 3
+# n_Class = 2
+# patience = 30
+
+dataset_path = "train/train_db_gray.mat"
+img_w = 256
+img_h = 256
+img_d = 1
 n_Class = 2
 patience = 30
 
+
 print("Loading dataset...")
-# image, gender, ageClass, _, _, image_size, _ = load_data(dataset_path)
-X, y, X_val, y_val = load_data(dataset_path)
+# X, y, X_val, y_val = load_data(dataset_path)
+X, y = load_data(dataset_path)
 # X_data, y_data_g, y_data_a = normalize_train_data(image, gender, ageClass)
 # print("Task Done. Lenght Dataset:", len(X_data))
 # X, X_val, y, y_val = train_test_split(X_data, y_data_a, test_size=.10)
-print("Task Done. Lenght Dataset:", len(X), "and:", len(X_val))
-print("Tamano:", y.shape, "and", y_val.shape)
+print('data loaded')
+X_train, y_train = normalize_train_data(X, y, n_Class,  img_w, img_h, img_d)
+print('data normalized')
+# print("Task Done. Lenght Dataset:", len(X), "and:", len(X_val))
+# print("Tamano:", y.shape, "and", y_val.shape)
 
 model = tiny_XCEPTION((img_h, img_w, img_d), n_Class, l2_regularization=0.01)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # checkpoint
-filepath="weights-{epoch:02d}-{val_acc:.3f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=True, mode='max')
-reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience), verbose=1)
-csv_logger = CSVLogger('history.csv')
-callbacks_list = [checkpoint, csv_logger, reduce_lr]
+filepath="pesos/weights-{epoch:02d}-{val_acc:.3f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='acc', verbose=1, save_best_only=True, save_weights_only=True, mode='max')
+# reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience), verbose=1)
+csv_logger = CSVLogger('history_class.csv')
+callbacks_list = [checkpoint, csv_logger]
 
 # Fit the model
 print('Now, Training the CNN ...')
 # graph = plot_model(model, to_file='model.png', show_shapes=True)
 #1
 # model.fit(X, y, validation_data=(X_val, y_val), nb_epoch=100, batch_size=600, verbose=2)
-history = model.fit(X, y, validation_data=(X_val, y_val), nb_epoch=15, batch_size=30, verbose=2, callbacks=callbacks_list)
-model.save_weights("model.h5")
-print('Training Finished and Weights saved!!!')
-np.save('history.npy', history) 
-print('History saved!!!')
+model.fit(X_train, y_train, nb_epoch=30, batch_size=60, verbose=1, callbacks=callbacks_list)
+# history = model.fit(X, y, validation_data=(X_val, y_val), nb_epoch=30, batch_size=30, verbose=1, callbacks=callbacks_list)
+# model.save_weights("model_class.h5")
+# print('Training Finished and Weights saved!!!')
+# np.save('history.npy', history) 
+# print('History saved!!!')
 
 
-print(history.history.keys())  
-plt.figure(1)  
+# print(history.history.keys())  
+# plt.figure(1)  
 
-print("Plotting Loss and Accuracy...")
-# summarize history for accuracy  
+# print("Plotting Loss and Accuracy...")
+# # summarize history for accuracy  
 
-plt.subplot(211)  
-plt.plot(history.history['acc'])  
-plt.plot(history.history['val_acc'])  
-plt.title('model accuracy')  
-plt.ylabel('accuracy')  
-plt.xlabel('epoch')  
-plt.legend(['train', 'test'], loc='upper left')  
+# plt.subplot(211)  
+# plt.plot(history.history['acc'])  
+# plt.plot(history.history['val_acc'])  
+# plt.title('model accuracy')  
+# plt.ylabel('accuracy')  
+# plt.xlabel('epoch')  
+# plt.legend(['train', 'test'], loc='upper left')  
 
-# summarize history for loss  
+# # summarize history for loss  
 
-plt.subplot(212)  
-plt.plot(history.history['loss'])  
-plt.plot(history.history['val_loss'])  
-plt.title('model loss')  
-plt.ylabel('loss')  
-plt.xlabel('epoch')  
-plt.legend(['train', 'test'], loc='upper left')  
-plt.show() 
+# plt.subplot(212)  
+# plt.plot(history.history['loss'])  
+# plt.plot(history.history['val_loss'])  
+# plt.title('model loss')  
+# plt.ylabel('loss')  
+# plt.xlabel('epoch')  
+# plt.legend(['train', 'test'], loc='upper left')  
+# plt.show() 
 
 
 

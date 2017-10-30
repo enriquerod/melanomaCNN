@@ -53,9 +53,9 @@ def get_im(path, img_w, img_h, img_d):
 
 def normalize_data(img_data, img_w, img_h, img_d):
     # print("Normalizing data...")
-    img_data = img_data.reshape(1, img_w, img_h, img_d)
+    # img_data = img_data.reshape(1, img_w, img_h, img_d)
     train_data = np.array(img_data,  dtype=np.uint8)
-    return img_data
+    return train_data
 
 # output_path = "img_dataset/" + str(fol) + "/" + str(fol)+'_aug_{}.png'
 
@@ -70,7 +70,7 @@ def normalize_data(img_data, img_w, img_h, img_d):
 
 img_w = 256
 img_h = 256
-img_d = 3
+img_d = 1
 
 
 path_data = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Training_Data"
@@ -106,10 +106,12 @@ def createDS(path_label, path_mask, img_w, img_h, img_d, output_path):
         data = masking(X1, X2)
         # plt.imshow(data)
         # plt.show()
+
         im_data = normalize_data(data, img_w, img_h, img_d)
         y = float(y)
         y = int(y)
         x_data.append(im_data)
+        # x_data.append(data)
         y_data.append(y)
     
     print(len(x_data), len(y_data))
@@ -118,7 +120,7 @@ def createDS(path_label, path_mask, img_w, img_h, img_d, output_path):
     print("Task DONE, File .mat created")
         
 
-output_path = 'train_db.mat'
+output_path = 'train_db_gray.mat'
 createDS(path_gt_data, path_mask_data, img_w, img_h, img_d, output_path)
 
 # print('Read train images and masks...')
