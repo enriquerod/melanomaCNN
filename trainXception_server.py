@@ -1,0 +1,128 @@
+import pandas as pd
+import numpy as np
+import logging
+import argparse
+import os
+from keras.callbacks import LearningRateScheduler, ModelCheckpoint
+from keras.optimizers import SGD
+from keras.optimizers import Nadam
+from keras.utils import np_utils
+
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import CSVLogger
+from keras.callbacks import ReduceLROnPlateau
+
+
+from sklearn.cross_validation import train_test_split
+from sklearn import preprocessing
+from keras.utils.vis_utils import plot_model
+import matplotlib.pyplot as plt
+
+from models import tiny_XCEPTION
+from scipy.io import loadmat
+# from utils import load_data
+
+
+def load_data(mat_path):
+    d = loadmat(mat_path)
+    return d["train"], d["y"]
+
+
+def normalize_train_data(image, y_Class, n_Class, img_w, img_h, img_d):
+    # data_x = image.reshape(image.shape[0], img_w, img_h, img_d)
+    image = image.reshape(image.shape[0], img_w, img_h, img_d)
+    data_x = image.astype('float32')
+    data_x = data_x/255
+    data_y = np_utils.to_categorical(y_Class, n_Class)
+
+    return data_x, data_y
+
+# dataset_path = "C:/git/dataset.mat"
+# img_w = 224
+# img_h = 224
+# img_d = 3
+# n_Class = 2
+# patience = 30
+dataset_path = "train_db_gray.mat"
+dataset_path_val = "val_db_gray.mat"
+# dataset_path = "train/train_db_gray.mat"
+img_w = 256
+img_h = 256
+img_d = 1
+n_Class = 2
+patience = 30
+
+
+print("Loading dataset...")
+# X, y, X_val, y_val = load_data(dataset_path)
+X, y = load_data(dataset_path)
+X_val, y_val = load_data(dataset_path_val)
+# X_data, y_data_g, y_data_a = normalize_train_data(image, gender, ageClass)
+# print("Task Done. Lenght Dataset:", len(X_data))
+# X, X_val, y, y_val = train_test_split(X_data, y_data_a, test_size=.10)
+print('data loaded')
+X_train, y_train = normalize_train_data(X, y, n_Class,  img_w, img_h, img_d)
+X_val2, y_val2 = normalize_train_data(X_val, y_val, n_Class,  img_w, img_h, img_d)
+print('data normalized')
+# print("Task Done. Lenght Dataset:", len(X), "and:", len(X_val))
+# print("Tamano:", y.shape, "and", y_val.shape)
+
+
+opt = Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
+# opt = SGD(lr=0.001)
+model = tiny_XCEPTION((img_h, img_w, img_d), n_Class, l2_regularization=0.01)
+# model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+# checkpoint
+filepath="weights-{epoch:02d}-{val_acc:.4f}.hdf5"
+# filepath="weights-{epoch:02d}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=True, mode='max')
+# reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience), verbose=1)
+csv_logger = CSVLogger('history_class.csv')
+callbacks_list = [checkpoint, csv_logger]
+
+# Fit the model
+print('Now, Training the CNN ...')
+# graph = plot_model(model, to_file='model.png', show_shapes=True)
+#1
+model.fit(X_train, y_train, validation_data=(X_val2, y_val2), nb_epoch=150, batch_size=30, verbose=1, callbacks=callbacks_list)
+# model.fit(X_train, y_train, nb_epoch=30, batch_size=60, verbose=1, callbacks=callbacks_list)
+
+
+
+# history = model.fit(X, y, validation_data=(X_val, y_val), nb_epoch=30, batch_size=30, verbose=1, callbacks=callbacks_list)
+# model.save_weights("model_class.h5")
+# print('Training Finished and Weights saved!!!')
+# np.save('history.npy', history) 
+# print('History saved!!!')
+
+
+# print(history.history.keys())  
+# plt.figure(1)  
+
+# print("Plotting Loss and Accuracy...")
+# # summarize history for accuracy  
+
+# plt.subplot(211)  
+# plt.plot(history.history['acc'])  
+# plt.plot(history.history['val_acc'])  
+# plt.title('model accuracy')  
+# plt.ylabel('accuracy')  
+# plt.xlabel('epoch')  
+# plt.legend(['train', 'test'], loc='upper left')  
+
+# # summarize history for loss  
+
+# plt.subplot(212)  
+# plt.plot(history.history['loss'])  
+# plt.plot(history.history['val_loss'])  
+# plt.title('model loss')  
+# plt.ylabel('loss')  
+# plt.xlabel('epoch')  
+# plt.legend(['train', 'test'], loc='upper left')  
+# plt.show() 
+
+
+
+

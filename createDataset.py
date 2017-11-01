@@ -73,8 +73,8 @@ img_h = 256
 img_d = 1
 
 
-path_data = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Training_Data"
-path_val = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Validation_Data"
+# path_data = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Training_Data"
+# path_val = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Validation_Data"
 
 path_mask_data = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Training_Part1_GroundTruth"
 path_mask_val = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Validation_Part1_GroundTruth"
@@ -86,7 +86,7 @@ path_gt_data = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Training_Part3_Groun
 path_gt_val = "C:/Users/EHO085/Desktop/data_skin/ISIC-2017_Validation_Part3_GroundTruth.csv"
 
 
-def createDS(path_label, path_mask, img_w, img_h, img_d, output_path):
+def createDS(path_label, path_data, path_mask, img_w, img_h, img_d, output_path):
     x_data = []
     y_data = []
     label_csv = np.genfromtxt(path_label, delimiter=",", dtype=None)
@@ -104,6 +104,7 @@ def createDS(path_label, path_mask, img_w, img_h, img_d, output_path):
         X2, X2_o = get_im(fl, img_w, img_h, 1)
         # print(X1.shape, X2.shape)
         data = masking(X1, X2)
+        # print(files.decode("utf-8"))
         # plt.imshow(data)
         # plt.show()
 
@@ -118,10 +119,17 @@ def createDS(path_label, path_mask, img_w, img_h, img_d, output_path):
     output = {"train": x_data, "y": y_data}
     scipy.io.savemat(output_path, output)
     print("Task DONE, File .mat created")
-        
 
-output_path = 'train_db_gray.mat'
-createDS(path_gt_data, path_mask_data, img_w, img_h, img_d, output_path)
+
+
+        
+#training dataset
+# output_path = 'train_db_gray.mat'
+# createDS(path_gt_data, path_data, path_mask_data, img_w, img_h, img_d, output_path)
+
+#validation dataset
+output_path = 'val_db_gray.mat'
+createDS(path_gt_val, path_val, path_mask_val, img_w, img_h, img_d, output_path)
 
 # print('Read train images and masks...')
 # new_train_csv = []
