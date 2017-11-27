@@ -18,6 +18,8 @@ import csv
 # Data augmentation just for the positive melanoma images
 # Classification with masking of the region os interest
 
+#Modificacion, from the masking cut the image to the region of interes
+
 
 ####################################################################################
 
@@ -115,15 +117,7 @@ for files in tqdm(train_label):
 
     out_im = path_im + "/" + files.decode("utf-8")  + "_aug{}.png"
     out_mk = path_mk + "/" + files.decode("utf-8")  + "_aug{}_segmentation.png"
-    # X1 = cv2.imread(path_data)
-    # X1= cv2.cvtColor(X1, cv2.COLOR_BGR2RGB)
-    # X1 = cv2.resize(X1, (img_w, img_h))
-    # X1 = X1.reshape(1, img_w, img_h, img_d)
 
-    # X2 = cv2.imread(path_mask)
-    # X2= cv2.cvtColor(X2, cv2.COLOR_BGR2GRAY)
-    # X2 = cv2.resize(X2, (img_w, img_h))
-    # X2 = X2.reshape(1, img_w, img_h, 1)
 
     # we create two instances with the same arguments
     data_gen_args = dict(featurewise_center=True,
@@ -184,27 +178,24 @@ with open('C:/Users/EHO085/Desktop/data_skin/segmentation/train_seg_aug.csv', 'w
     # wr.writerows(new_train_csv)
 
 
-# im = mpimg.imread("img_1.png")
-# mk = mpimg.imread("mask_1.png")
-# masking(im, mk)
+im = mpimg.imread("img_1.png")
+mk = mpimg.imread("mask_1.png")
+masking(im, mk)
 
 
 
-# os.makedirs('augmented')
-# #, save_prefix='aug'
-# i=0
-# for batch in datagen.flow(X1, save_to_dir='augmented', save_format='png', save_prefix='prod'):
-#     # for i in range(0, 9):
-#     #     plt.subplot(330 + 1 + i)
-#     #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
-#         # if img_d == 1:
-#         #     img_aux = X_batch[i].reshape(img_w, img_h)
-#         #     plt.imshow(img_aux, cmap=plt.get_cmap('gray'))
-#         # else:
-#         #     img_aux = X_batch[i].reshape(img_w, img_h, img_d)
-#         #     plt.imshow(cv2.cvtColor(img_aux, cv2.COLOR_BGR2RGB))
-    
-#     #plt.show()
-#     i+=1
-#     if i >= 30:
-#         break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
