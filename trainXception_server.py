@@ -91,37 +91,38 @@ model.fit(X_train, y_train, validation_data=(X_val2, y_val2), nb_epoch=150, batc
 
 
 
-# history = model.fit(X, y, validation_data=(X_val, y_val), nb_epoch=30, batch_size=30, verbose=1, callbacks=callbacks_list)
-# model.save_weights("model_class.h5")
-# print('Training Finished and Weights saved!!!')
-# np.save('history.npy', history) 
-# print('History saved!!!')
 
 
-# print(history.history.keys())  
-# plt.figure(1)  
 
-# print("Plotting Loss and Accuracy...")
-# # summarize history for accuracy  
 
-# plt.subplot(211)  
-# plt.plot(history.history['acc'])  
-# plt.plot(history.history['val_acc'])  
-# plt.title('model accuracy')  
-# plt.ylabel('accuracy')  
-# plt.xlabel('epoch')  
-# plt.legend(['train', 'test'], loc='upper left')  
 
-# # summarize history for loss  
 
-# plt.subplot(212)  
-# plt.plot(history.history['loss'])  
-# plt.plot(history.history['val_loss'])  
-# plt.title('model loss')  
-# plt.ylabel('loss')  
-# plt.xlabel('epoch')  
-# plt.legend(['train', 'test'], loc='upper left')  
-# plt.show() 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
