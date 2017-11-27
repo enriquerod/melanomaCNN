@@ -1,10 +1,14 @@
-# import matplotlib.pyplot as plt     
-# array = [[80,20],
-#         [7,93]]
+import matplotlib.pyplot as plt     
+array = [[80,20],
+        [7,93]]
 
-# plt.matshow(array)
+plt.matshow(array)
 
-# plt.colorbar()
+plt.colorbar()
+
+plt.show()
+
+input()
 
 
 import seaborn as sn
@@ -28,8 +32,9 @@ plt.figure(figsize = (10,7))
 
 sn.heatmap(df_cm, annot=True)
 
+plt.show()
 
-
+input()
 
 
 
