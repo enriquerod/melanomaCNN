@@ -173,3 +173,4 @@ plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=14))
 
 
 plt.show()
+input()
