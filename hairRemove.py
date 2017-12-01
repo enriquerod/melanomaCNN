@@ -14,6 +14,9 @@ kernel = np.ones((5,5),np.uint8)
 kernel2 = np.ones((3,3),np.uint8)
 
 
+
+
+
 # cv2.imshow("original", img)
 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 plt.show()
@@ -53,24 +56,6 @@ print(n)
 print(m)
 print(img.dtype)
 
-# a = thresh2 > 0
-# print(a)
-# x = np.argwhere(a)
-# print(x)
-# x[:,[0,1]] = x[:,[1,0]]
-
-# for k,i in enumerate(x):
-#     print(k)
-#     img.itemset((i[0],i[1],0),0)
-#     img.itemset((i[0],i[1],1),0)
-#     img.itemset((i[0],i[1],2),0)
-
-
-# print(x)
-# print(x.shape)
-# print(img.shape)
-# img[x] = [0,0,0]
-
 
 for i in range(thresh2.shape[0]):
     for j in range(thresh2.shape[1]):
@@ -96,3 +81,7 @@ plt.show()
 # print('imprimir segunda')
 # plt.imshow(img, cmap = 'Greys', interpolation = 'None')
 # plt.show()
+
+
+
+
